@@ -1,0 +1,54 @@
+*vim-autopreview.txt*
+Plugin that uses preview window to show function signature
+
+==============================================================================
+Author:  adamlabbe@gmail.com                          *vim-autopreview-author*
+License: Same terms as Vim itself (see |license|)
+
+
+==============================================================================
+INTRODUCTION                                                 *vim-autopreview*
+
+This plugin is for previewing function signatures in the preview window.
+It uses |ptag| to jump the preview window to a definition. |ptag| depends on
+a tag file being set with |tag|.
+It takes advantage of CursorHold, so |updatetime| should be set to something
+short:
+
+  let updatetime=250
+
+Another built-in vim setting is the |previewheight| setting, which defines 
+how many lines of context will be shown when the preview is shown:
+
+  let previewheight=3
+
+
+:AutoPreviewToggle                                        *:AutoPreviewToggle*
+
+Enable or disable automatic preview.
+
+:PreviewWord                                                    *:PreviewWord*
+
+Execute preview on word under cursor. Useful for keybinds:
+
+Example:
+>
+    map <leader>s :PreviewWord<CR>
+<
+
+==============================================================================
+CONFIGURATION                                  *vim-autopreview-configuration*
+
+                                                       *g:AutoPreview_enabled*
+g:AutoPreview_enabled
+Default: 1
+
+Use this to automatically enable or disable previewing.
+
+                                             *g:AutoPreview_allowed_filetypes*
+g:AutoPreview_allowed_filetypes
+Default: ['c', 'cpp']
+
+This option sets which filetypes auto-prevoew will be enabled.
+
+vim:set et sw=4 ts=4 tw=78:

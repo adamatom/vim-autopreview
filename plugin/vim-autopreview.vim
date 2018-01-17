@@ -13,6 +13,7 @@ if !exists('g:AutoPreview_allowed_filetypes')
 endif
 
 command! -nargs=0 -bar AutoPreviewToggle :call s:AutoPreviewToggle()
+command! -nargs=0 -bar PreviewWord :call s:PreviewWord()
 
 if g:AutoPreview_enabled
     augroup AutoPreview
@@ -56,43 +57,46 @@ func s:SetCursorHoldAutoCmd()
             " auto refresh the ptag window
             au! CursorHold <buffer> nested :call s:PreviewWord()
             au! CursorHoldI <buffer> nested :call s:PreviewWord()
-            ":echo "set autocmd for " . &ft . " in " . expand("%")
         else
             au! CursorHold <buffer>
             au! CursorHoldI <buffer>
-            ":echo "unset autocmd for " . &ft . " in " . expand("%")
         endif
     augroup END
 endfunc
 
 func s:PreviewWord()
-    if &previewwindow
+    if &previewwindow           " don't do this in the preview window
         return
     endif
-    let l:w = expand('<cword>')     " get the word under cursor
-    if l:w =~ '\a'                  " if the word contains a letter
+    let l:w = expand('<cword>')       " get the word under cursor
+    if l:w =~ '\a'            " if the word contains a letter
+
+        " Try displaying a matching tag for the word under the cursor
         try
             silent! exe 'ptag ' . l:w
         catch
             return
         endtry
-        let l:oldwin = winnr() "get current window
-        silent! wincmd P "jump to preview window 
-        if &previewwindow "if jump to preview windows successfully
+
+        let l:oldwin = winnr()  " get origin window
+        silent! wincmd P            " jump to preview window
+
+        if &previewwindow       " if we really get there...
             if has('folding')
-                silent! .foldopen "unfold
+                silent! .foldopen       " don't want a closed fold
             endif
-            call search('$','b') "to the end of last line
-            let l:w = substitute(l:w,'\\','\\\\','')
-            call search('\<\V' . l:w . '\>') "cursor on the match word
 
-            match none "delete the current highlight marks
+            call search('$', 'b')       " to end of previous line
+            let l:w = substitute(l:w, '\\', '\\\\', '')
+            call search('\<\V' . l:w . '\>')  " position cursor on match
 
-            "high light the match word in the previewwindow
-            hi previewWord term=bold ctermbg=green guibg=green
+            match none " delete existing highlight
+
+            " Add a match highlight to the word at this position
+            hi previewWord term=bold ctermbg=white guibg=white ctermfg=black guifg=black
             exe 'match previewWord "\%' . line('.') . 'l\%' . col('.') . 'c\k*"'
-            exec l:oldwin.'wincmd l:w'
-            "back from preview window
+            " back to old window
+            exec l:oldwin.'wincmd w'
         endif
     endif
 endfun
